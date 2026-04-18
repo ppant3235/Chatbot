@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Chatbot</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background: #020617;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin: 0;
+}
+
+/* Chat area */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* messages */
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.msg {
+  padding: 10px 15px;
+  margin: 10px 0;
+  max-width: 60%;
+  border-radius: 12px;
+}
+
+.user {
+  background: #2563eb;
+  margin-left: auto;
+  text-align: right;
+}
+
+.bot {
+  background: #334155;
+  margin-right: auto;
+}
+
+/* input box */
+.input-box {
+  display: flex;
+  padding: 15px;
+  background: #1e293b;
+}
+
+input {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  background: #0f172a;
+  color: white;
+}
+
+button {
+  margin-left: 10px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>🧠 My Chatbot</h2>
+    <p>Hybrid AI Assistant</p>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-area">
+
+    <div id="messages" class="messages"></div>
+
+    <div class="input-box">
+      <input id="msg" placeholder="Type your message..." />
+      <button onclick="send()">Send</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+async function send() {
+  const input = document.getElementById("msg");
+  const msg = input.value;
+  if (!msg) return;
+
+  const chat = document.getElementById("messages");
+
+  // user message
+  chat.innerHTML += `<div class="msg user">${msg}</div>`;
+
+  input.value = "";
+
+  // send to backend
+  const res = await fetch("http://localhost:3000/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: msg })
+  });
+
+  const data = await res.json();
+
+  // bot message
+  chat.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// Enter key support
+document.getElementById("msg").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") send();
+});
+</script>
+
+</body>
+</html>
